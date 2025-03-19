@@ -10,3 +10,9 @@ def mask_account_card(nums: str) -> str:
         return new_card
 
 print(mask_account_card('Visa Platinum 7000792289606361'))
+
+
+def get_data(date:str) -> str:
+    return f'{date[8:10]}.{date[5:7]}.{date[0:4]}'
+
+print(get_data('2024-03-11T02:26:18.671407'))
