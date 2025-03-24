@@ -1,0 +1,8 @@
+exclude = '''
+(
+    /(
+        /.idea
+    )/
+    _pycache_
+)
+'''
