@@ -20,7 +20,7 @@ def get_mask_account(account_number: Union[str]) -> Union[str]:
     """Возвращаем замаскированный номер счёта"""
     len_acc_number = 20
     if isinstance(account_number, int):
-        card_number = str(account_number)
+        account_number = str(account_number)
     if len(account_number) == len_acc_number and account_number.isdigit():
         return f"**{account_number[-4:]}"
     else:
