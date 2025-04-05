@@ -1,8 +1,7 @@
 from typing import Dict, List
 
 
-def filter_by_state(info_list: List[Dict],
-                    state: str = 'EXECUTED') -> List[Dict]:
+def filter_by_state(info_list: List[Dict], state: str = "EXECUTED") -> List[Dict]:
     """Функция для фильтрации словарей в списке по заданному ключу"""
     return [item for item in info_list if item.get("state") == state]
 
