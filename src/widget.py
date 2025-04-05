@@ -26,5 +26,3 @@ def get_data(date: str) -> str:
 
 
 print(get_data("2024-03-11T02:26:18.671407"))
-
-# изменения #
