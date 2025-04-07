@@ -26,7 +26,7 @@ isort = "^6.0.1"
 pytest = "^8.3.5"
 
 [tool.flake8]
-line_length = 119
+line_length = 100
 exclude = '''
 (
     /(
@@ -37,7 +37,7 @@ exclude = '''
 '''
 
 [tool.black]
-line_length = 119
+line_length = 100
 exclude = '''
 (
     /(
@@ -55,7 +55,7 @@ exclude = '''
 '''
 
 [tool.isort]
-line_length = 119
+line_length = 100
 
 [tool.mypy]
 disallow_untyped_defs = true
