@@ -1,48 +1,50 @@
 import pytest
-from src.widget import mask_account_card, get_data
+from src.widget import mask_account_card
 
+# Проверка: корректный номер карты
+def test_mask_account_card_valid_card():
+    data = "Visa 1234567812345678"
+    result = mask_account_card(data)
+    assert result == "Visa 1234 56** **** 5678"  # маскируем средние цифры
 
-@pytest.mark.parametrize(
-    "user_input, expected",
-    [
-        ("Счет 8432014830921482302394", "Счет **2394"),
-        ("Visa Platinum 2131231284932299", "Visa Platinum 213123******2299"),
-    ],
-)
-def test_mask_account_card(user_input, expected):
-    assert mask_account_card(user_input) == expected
+# Проверка: корректный номер счёта
+def test_mask_account_card_valid_account():
+    data = "Счет 12345678901234567890"
+    result = mask_account_card(data)
+    assert result == "Счет **7890"  # показываем только последние 4 цифры
 
+# Проверка: только текст, без номера
+def test_mask_account_card_invalid_format_only_text():
+    data = "Просто текст без номера"
+    result = mask_account_card(data)
+    assert result == "Неверный формат данных"  # формат неправильный
 
-@pytest.mark.parametrize(
-    "user_input, expected",
-    [
-        ("Maestro 7000792289606361", "Maestro 700079******6361"),
-        ("Visa 7000792289606361", "Visa 700079******6361"),
-        ("Mir 7289094321672902", "Mir 728909******2902"),
-        ("Счет 8432014830921482304", "Счет **2304"),
-    ],
-)
-def uni_mask_account_card(user_input, expected):
-    assert mask_account_card(user_input) == expected
+# Проверка: номер карты слишком короткий
+def test_mask_account_card_invalid_length_card():
+    data = "Visa 12345678"
+    result = mask_account_card(data)
+    assert result == "Неверный формат данных"  # недостаточно цифр
 
+# Проверка: номер счёта слишком короткий
+def test_mask_account_card_invalid_length_account():
+    data = "Счет 12345678"
+    result = mask_account_card(data)
+    assert result == "Неверный формат данных"  # тоже короткий
 
-@pytest.mark.parametrize(
-    "user_input, expected",
-    [
-        ("2.02", "Введите номер карты или счет"),
-        ("Счет 1", "Введите номер карты или счет"),
-        ("", "Введите номер карты или счет"),
-    ],
-)
-def empty_mask_account_card(user_input, expected):
-    assert mask_account_card(user_input) == expected
+# Проверка: передана пустая строка
+def test_mask_account_card_empty_string():
+    data = ""
+    result = mask_account_card(data)
+    assert result == "Неверный формат данных"
 
+# Проверка: отсутствует номер (только Visa)
+def test_mask_account_card_missing_number():
+    data = "Visa"
+    result = mask_account_card(data)
+    assert result == "Неверный формат данных"
 
-@pytest.fixture
-def right_get_date():
-    assert get_data("2024-03-11T02:26:18.671407") == "11.03.2024"
-
-
-@pytest.fixture
-def test_get_date():
-    assert get_data("") == "Нет данных о дате"
+# Проверка: номер содержит буквы
+def test_mask_account_card_non_digit_number():
+    data = "Visa 1234ABCD5678FGH1"
+    result = mask_account_card(data)
+    assert result == "Неверный формат данных"

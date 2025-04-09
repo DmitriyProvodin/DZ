@@ -1,28 +1,24 @@
-from . import masks
+from src.masks import get_mask_card_number, get_mask_account
 
-"""импортируем файлы из masks"""
+def mask_account_card(data: str) -> str:
+    """
+    Маскирует номер карты или счета в строке
+    """
+    parts = data.split()
+    if not parts:
+        return "Неверный формат данных"
 
+    # Последнее значение — номер
+    number = parts[-1]
+    name = " ".join(parts[:-1])  # Всё, что до номера — имя карты/типа
 
-def mask_account_card(nums: str) -> str:
-    if "Счёт" in nums:
-        return masks.get_mask_account(nums)
+    if number.isdigit() and len(number) == 16:
+        # Карта
+        masked = get_mask_card_number(number)
+        return f"{name} {masked}"
+    elif number.isdigit() and len(number) == 20:
+        # Счёт
+        masked = get_mask_account(number)
+        return f"{name} {masked}"
     else:
-        cards = masks.get_mask_card_number(nums[-16:])
-        new_card = nums.replace(nums[-16:], cards)
-        return new_card
-
-
-"создаём функцию шифрования данных"
-
-
-print(mask_account_card("Visa Platinum 7000792289606361"))
-
-
-def get_data(date: str) -> str:
-    return f"{date[8:10]}.{date[5:7]}.{date[0:4]}"
-
-
-"возвращаем корректную дату"
-
-
-print(get_data("2024-03-11T02:26:18.671407"))
+        return "Неверный формат данных"
