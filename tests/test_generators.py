@@ -1,119 +1,101 @@
 import pytest
+from typing import List, Dict
 from generators import filter_by_currency, transaction_descriptions, card_number_generator
 
-# Пример данных транзакций (взяты из условия)
-transactions = (
-    [
-        {
-            "id": 939719570,
-            "state": "EXECUTED",
-            "date": "2018-06-30T02:08:58.425572",
-            "operationAmount": {
-                "amount": "9824.07",
-                "currency": {
-                    "name": "USD",
-                    "code": "USD"
-                }
-            },
-            "description": "Перевод организации",
-            "from": "Счет 75106830613657916952",
-            "to": "Счет 11776614605963066702"
+# Пример списка транзакций
+transactions: List[Dict] = [
+    {
+        "id": 1,
+        "state": "EXECUTED",
+        "date": "2023-01-01T12:00:00.000000",
+        "operationAmount": {
+            "amount": "100.00",
+            "currency": {
+                "name": "USD",
+                "code": "USD"
+            }
         },
-        {
-            "id": 142264268,
-            "state": "EXECUTED",
-            "date": "2019-04-04T23:20:05.206878",
-            "operationAmount": {
-                "amount": "79114.93",
-                "currency": {
-                    "name": "USD",
-                    "code": "USD"
-                }
-            },
-            "description": "Перевод со счета на счет",
-            "from": "Счет 19708645243227258542",
-            "to": "Счет 75651667383060284188"
+        "description": "Перевод организации",
+        "from": "Счет 11111111111111111111",
+        "to": "Счет 22222222222222222222"
+    },
+    {
+        "id": 2,
+        "state": "EXECUTED",
+        "date": "2023-01-02T12:00:00.000000",
+        "operationAmount": {
+            "amount": "200.00",
+            "currency": {
+                "name": "руб.",
+                "code": "RUB"
+            }
         },
-        {
-            "id": 873106923,
-            "state": "EXECUTED",
-            "date": "2019-03-23T01:09:46.296404",
-            "operationAmount": {
-                "amount": "43318.34",
-                "currency": {
-                    "name": "руб.",
-                    "code": "RUB"
-                }
-            },
-            "description": "Перевод со счета на счет",
-            "from": "Счет 44812258784861134719",
-            "to": "Счет 74489636417521191160"
+        "description": "Оплата услуг",
+        "from": "Счет 33333333333333333333",
+        "to": "Счет 44444444444444444444"
+    },
+    {
+        "id": 3,
+        "state": "EXECUTED",
+        "date": "2023-01-03T12:00:00.000000",
+        "operationAmount": {
+            "amount": "300.00",
+            "currency": {
+                "name": "USD",
+                "code": "USD"
+            }
         },
-        {
-            "id": 895315941,
-            "state": "EXECUTED",
-            "date": "2018-08-19T04:27:37.904916",
-            "operationAmount": {
-                "amount": "56883.54",
-                "currency": {
-                    "name": "USD",
-                    "code": "USD"
-                }
-            },
-            "description": "Перевод с карты на карту",
-            "from": "Visa Classic 6831982476737658",
-            "to": "Visa Platinum 8990922113665229"
-        },
-        {
-            "id": 594226727,
-            "state": "CANCELED",
-            "date": "2018-09-12T21:27:25.241689",
-            "operationAmount": {
-                "amount": "67314.70",
-                "currency": {
-                    "name": "руб.",
-                    "code": "RUB"
-                }
-            },
-            "description": "Перевод организации",
-            "from": "Visa Platinum 1246377376343588",
-            "to": "Счет 14211924144426031657"
-        }
-    ]
-)
+        "description": "Покупка",
+        "from": "Счет 55555555555555555555",
+        "to": "Счет 66666666666666666666"
+    }
+]
 
-# Тест функции filter_by_currency
-def test_filter_by_currency():
-    # Создаем генератор по валюте USD
-    usd_gen = filter_by_currency(transactions, "USD")
+# Тест: фильтрация по валюте USD
+def test_filter_by_currency_usd() -> None:
+    result = list(filter_by_currency(transactions, "USD"))
+    assert len(result) == 2
+    assert result[0]["id"] == 1
+    assert result[1]["id"] == 3
 
-    # Преобразуем генератор в список
-    usd_list = list(usd_gen)
+# Тест: фильтрация по валюте, которой нет
+def test_filter_by_currency_not_found() -> None:
+    result = list(filter_by_currency(transactions, "EUR"))
+    assert result == []
 
-    # Проверяем количество и описание
-    assert len(usd_list) == 3
-    assert usd_list[0]["description"] == "Перевод организации"
-    assert usd_list[1]["description"] == "Перевод со счета на счет"
-    assert usd_list[2]["description"] == "Перевод с карты на карту"
+# Тест: фильтрация пустого списка
+def test_filter_by_currency_empty_list() -> None:
+    result = list(filter_by_currency([], "USD"))
+    assert result == []
 
-# Тест генератора описаний
-def test_transaction_descriptions():
-    # Получаем генератор описаний
-    descriptions = transaction_descriptions(transactions)
+# Тест: генерация описаний транзакций
+def test_transaction_descriptions() -> None:
+    gen = transaction_descriptions(transactions)
+    assert next(gen) == "Перевод организации"
+    assert next(gen) == "Оплата услуг"
+    assert next(gen) == "Покупка"
 
-    # Проверяем первые 3 описания
-    assert next(descriptions) == "Перевод организации"
-    assert next(descriptions) == "Перевод со счета на счет"
-    assert next(descriptions) == "Перевод со счета на счет"
+# Тест: генерация описаний из пустого списка
+def test_transaction_descriptions_empty() -> None:
+    gen = transaction_descriptions([])
+    with pytest.raises(StopIteration):
+        next(gen)
 
-# Тест генератора номеров карт
-def test_card_number_generator():
-    # Генерируем от 1 до 3
-    cards = list(card_number_generator(1, 3))
-
-    # Проверка результата
-    assert cards == [
+# Тест: генерация номеров карт в диапазоне
+def test_card_number_generator_range() -> None:
+    gen = list(card_number_generator(1, 3))
+    assert gen == [
         "0000 0000 0000 0001",
         "0000 0000 0000 0002",
         "0000 0000 0000 0003"
     ]
+
+# Тест: генерация одного номера карты
+def test_card_number_generator_single() -> None:
+    gen = list(card_number_generator(1234567890123456, 1234567890123456))
+    assert gen == ["1234 5678 9012 3456"]
+
+# Тест: генерация при начальном > конечного — пусто
+def test_card_number_generator_invalid_range() -> None:
+    gen = list(card_number_generator(5, 1))
+    assert gen == []
