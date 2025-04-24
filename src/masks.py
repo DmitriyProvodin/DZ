@@ -1,28 +1,28 @@
-from typing import Union
+from logger_config import setup_logger
 
-def get_mask_card_number(card_number: Union[str, int]) -> Union[str]:
-    """Возвращаем замаскированный номер карты"""
-    len_number = 16
-    if isinstance(card_number, int):
-        card_number = str(card_number)
-    if len(card_number) == len_number and card_number.isdigit():
-        return f'{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}'
-    else:
-        return "Вы ввели некорректные данные!"
+logger = setup_logger("masks", "masks.log")
 
-def get_mask_account(account_number: Union[str, int]) -> Union[str]:
-    """Возвращаем замаскированный номер счёта"""
-    len_acc_number = 20
-    if isinstance(account_number, int):
-        account_number = str(account_number)
-    if len(account_number) == len_acc_number and account_number.isdigit():
-        return f'**{account_number[-4:]}'
-    else:
-        return "Вы ввели некорректные данные!"
+def mask_card_number(card_number: str) -> str:
+    """
+    Маскирует номер карты: показывает первые 6 и последние 4 цифры, остальное заменяет на '*'.
+    """
+    try:
+        masked = f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
+        logger.info(f"Маскирование номера карты: {card_number} -> {masked}")
+        return masked
+    except Exception as e:
+        logger.error(f"Ошибка при маскировании номера карты: {card_number} — {e}")
+        return card_number
 
-if __name__ == "__main__":
-    card_number: str = input("Введите номер карты:")
-    account_number: str = input("Введите номер счета:")
 
-    print(get_mask_card_number(card_number))
-    print(get_mask_account(account_number))
+def mask_account_number(account_number: str) -> str:
+    """
+    Маскирует номер счёта: показывает только последние 4 цифры, остальное заменяет на '*'.
+    """
+    try:
+        masked = f"**{account_number[-4:]}"
+        logger.info(f"Маскирование номера счёта: {account_number} -> {masked}")
+        return masked
+    except Exception as e:
+        logger.error(f"Ошибка при маскировании номера счёта: {account_number} — {e}")
+        return account_number
