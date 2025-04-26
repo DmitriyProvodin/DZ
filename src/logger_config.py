@@ -1,32 +1,24 @@
 import logging
 import os
 
-LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok=True)
 
-# Хранит уже созданные логгеры, чтобы не дублировать хендлеры
-_loggers: dict[str, logging.Logger] = {}
-
-def setup_logger(name: str, log_file: str) -> logging.Logger:
-    if name in _loggers:
-        return _loggers[name]
-
-    log_path = os.path.join(LOG_DIR, log_file)
+def setup_logger(name: str, filename: str) -> logging.Logger:
+    """
+    Настраивает логгер для модуля.
+    """
+    logs_dir = "logs"
+    os.makedirs(logs_dir, exist_ok=True)
+    filepath = os.path.join(logs_dir, filename)
 
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
-    # Очищаем старые хендлеры, если перезапускается
-    logger.handlers.clear()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-    # Перезапись файла при каждом запуске
-    file_handler = logging.FileHandler(log_path, mode='w', encoding='utf-8')
-    formatter = logging.Formatter(
-        fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
-    )
+    file_handler = logging.FileHandler(filepath, mode='w', encoding='utf-8')
     file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
 
-    _loggers[name] = logger
+    if not logger.handlers:
+        logger.addHandler(file_handler)
+
     return logger

@@ -17,18 +17,18 @@ def load_transactions(path: str) -> list[dict[str, Any]]:
             return []
 
         with open(path, "r", encoding="utf-8") as file:
-            data = json.load(file)
+            data: Any = json.load(file)
 
         if not isinstance(data, list):
-            logger.warning(f"Ожидался список, но получено: {type(data)}")
+            logger.warning(f"Файл {path} не содержит список.")
             return []
 
         logger.info(f"Успешно загружено {len(data)} транзакций из {path}")
         return data
 
     except json.JSONDecodeError as e:
-        logger.error(f"Ошибка при чтении JSON из файла {path}: {e}")
+        logger.error(f"Ошибка чтения JSON из {path}: {e}")
         return []
     except Exception as e:
-        logger.error(f"Неожиданная ошибка при загрузке транзакций из {path}: {e}")
+        logger.error(f"Непредвиденная ошибка при загрузке {path}: {e}")
         return []
