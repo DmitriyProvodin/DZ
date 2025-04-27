@@ -4,21 +4,37 @@ import os
 
 def setup_logger(name: str, filename: str) -> logging.Logger:
     """
-    Настраивает логгер для модуля.
+    Настраивает и возвращает логгер с именем name, который пишет в logs/filename.
+    Лог файл будет перезаписываться при каждом запуске приложения.
     """
-    logs_dir = "logs"
-    os.makedirs(logs_dir, exist_ok=True)
-    filepath = os.path.join(logs_dir, filename)
 
+    # Создаем папку logs, если её нет
+    logs_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Logs")
+    os.makedirs(logs_dir, exist_ok=True)
+
+    # Полный путь до файла лога
+    log_path = os.path.join(logs_dir, filename)
+
+    # Создаем логгер
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    # Очищаем предыдущие хендлеры, чтобы не плодились логи
+    if logger.hasHandlers():
+        logger.handlers.clear()
 
-    file_handler = logging.FileHandler(filepath, mode='w', encoding='utf-8')
+    # Создаем обработчик для записи в файл (перезаписывает файл при запуске)
+    file_handler = logging.FileHandler(log_path, mode='w', encoding='utf-8')
+    file_handler.setLevel(logging.DEBUG)
+
+    # Настраиваем форматтер
+    formatter = logging.Formatter(
+        fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S"
+    )
     file_handler.setFormatter(formatter)
 
-    if not logger.handlers:
-        logger.addHandler(file_handler)
+    # Добавляем обработчик к логгеру
+    logger.addHandler(file_handler)
 
     return logger
