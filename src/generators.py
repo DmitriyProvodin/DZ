@@ -1,36 +1,28 @@
-from typing import Iterator, Dict, List
+from typing import Iterator
 
+def filter_by_currency(data: list[dict], currency: str = "USD") -> Iterator[dict]:
+    """
+    Генератор, возвращающий операции в указанной валюте.
+    """
+    for item in data:
+        if item.get("operationAmount", {}).get("currency", {}).get("code") == currency:
+            yield item
 
-# Генератор транзакций по заданной валюте
-def filter_by_currency(transactions: List[Dict], currency_code: str) -> Iterator[Dict]:
+def transaction_descriptions(data: list[dict]) -> Iterator[str]:
     """
-    Фильтрует список транзакций по нужной валюте (например, USD)
-    Возвращает итератор подходящих транзакций
+    Генератор, возвращающий описания операций.
     """
-    for transaction in transactions:
-        if (
-            "operationAmount" in transaction
-            and "currency" in transaction["operationAmount"]
-            and transaction["operationAmount"]["currency"].get("code") == currency_code
-        ):
-            yield transaction
+    for item in data:
+        desc = item.get("description")
+        if desc:
+            yield desc
 
-
-# Генератор описаний транзакций
-def transaction_descriptions(transactions: List[Dict]) -> Iterator[str]:
+def card_number_generator(data: list[dict]) -> Iterator[str]:
     """
-    Генератор, который по одному выдает описания операций из списка транзакций
+    Генератор, возвращающий все номера карт/счетов из 'from' и 'to'.
     """
-    for transaction in transactions:
-        if "description" in transaction:
-            yield transaction["description"]
-
-
-# Генератор номеров карт
-def card_number_generator(start: int, end: int) -> Iterator[str]:
-    """
-    Генератор, выдающий номера карт от start до end включительно
-    Формат номера: XXXX XXXX XXXX XXXX
-    """
-    for number in range(start, end + 1):
-        yield f"{number:016d}"[:4] + " " + f"{number:016d}"[4:8] + " " + f"{number:016d}"[8:12] + " " + f"{number:016d}"[12:]
+    for item in data:
+        for key in ("from", "to"):
+            value = item.get(key)
+            if value:
+                yield value

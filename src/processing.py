@@ -1,14 +1,19 @@
-def filter_by_state(data: list, state: str = "EXECUTED") -> list:
-    """
-    Возвращает список операций, у которых статус совпадает с переданным.
-    По умолчанию фильтрует по статусу "EXECUTED".
-    """
-    return [item for item in data if item.get("state") == state]
+from typing import Iterator
 
+def filter_by_status(data: list[dict], status: str = "EXECUTED") -> Iterator[dict]:
+    """
+    Возвращает только те операции, у которых заданный статус.
+    """
+    for item in data:
+        if item.get("state") == status:
+            yield item
 
-def sort_by_date(data: list, reverse: bool = True) -> list:
+def sort_by_date(data: list[dict], reverse: bool = True) -> list[dict]:
     """
-    Сортирует список операций по дате.
-    По умолчанию сортирует по убыванию (reverse=True).
+    Сортирует операции по дате.
     """
-    return sorted(data, key=lambda x: x.get("date"), reverse=reverse)
+    return sorted(
+        [item for item in data if "date" in item],
+        key=lambda x: x["date"],
+        reverse=reverse
+    )
