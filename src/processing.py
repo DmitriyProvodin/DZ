@@ -1,19 +1,33 @@
-from typing import Iterator
+from typing import List, Dict
 
-def filter_by_status(data: list[dict], status: str = "EXECUTED") -> Iterator[dict]:
-    """
-    Возвращает только те операции, у которых заданный статус.
-    """
-    for item in data:
-        if item.get("state") == status:
-            yield item
 
-def sort_by_date(data: list[dict], reverse: bool = True) -> list[dict]:
+def sort_by_date(transactions: List[Dict], ascending: bool = False) -> List[Dict]:
     """
-    Сортирует операции по дате.
+    Сортировка транзакций по дате.
     """
-    return sorted(
-        [item for item in data if "date" in item],
-        key=lambda x: x["date"],
-        reverse=reverse
-    )
+    return sorted(transactions, key=lambda t: t.get("date", ""), reverse=not ascending)
+
+
+def filter_by_currency(transactions: List[Dict], currency_code: str = "RUB") -> List[Dict]:
+    """
+    Фильтрация транзакций по коду валюты (по умолчанию: RUB).
+    """
+    return [
+        t for t in transactions
+        if t.get("operationAmount", {}).get("currency", {}).get("code") == currency_code
+    ]
+
+
+def display_operations(transactions: List[Dict]) -> None:
+    """
+    Вывод списка операций в консоль в читаемом формате.
+    """
+    print(f"\nВсего банковских операций в выборке: {len(transactions)}\n")
+    for t in transactions:
+        date = t.get("date", "")[:10]
+        desc = t.get("description", "")
+        from_ = t.get("from", "Не указано")
+        to_ = t.get("to", "Не указано")
+        amount = t.get("operationAmount", {}).get("amount", 0)
+        currency = t.get("operationAmount", {}).get("currency", {}).get("code", "RUB")
+        print(f"{date} {desc}\n{from_} -> {to_}\nСумма: {amount} {currency}\n")
