@@ -1,30 +1,16 @@
-# widget.py
-
 from datetime import datetime
-
-def mask_account_number(account: str) -> str:
-    """
-    Маскирует номер счёта: оставляет только последние 4 цифры.
-    Пример: "Счет 43219876543212345678" → "Счет **5678"
-    """
-    parts = account.split()
-    if len(parts) == 2 and parts[0].lower() == "счет":
-        return f"{parts[0]} **{parts[1][-4:]}"
-    return account
+from src.masks import mask_account_number, mask_card_number
 
 
-def mask_card_number(card: str) -> str:
-    """
-    Маскирует номер карты: показывает первые 6 и последние 4 цифры, остальное заменяет на ****
-    Пример: "Visa Platinum 7492657788887202" → "Visa Platinum 7492 65** **** 7202"
-    """
-    parts = card.split()
-    if len(parts) >= 2:
-        name = " ".join(parts[:-1])
-        number = parts[-1]
-        if len(number) >= 16:
-            return f"{name} {number[:4]} {number[4:6]}** **** {number[-4:]}"
-    return card
+def get_mask_account_card(card_or_account: str) -> str:
+    number = card_or_account.split(" ")[-1]
+    if number.isdigit():
+        if len(number) == 16:
+            return mask_card_number(card_or_account)
+        else:
+            return mask_account_number(card_or_account)
+    else:
+        return card_or_account
 
 
 def format_date(date_str: str) -> str:

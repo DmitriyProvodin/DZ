@@ -1,33 +1,42 @@
 from typing import List, Dict
+from collections import Counter
+import re
+from src.widget import format_date, get_mask_account_card
 
 
-def sort_by_date(transactions: List[Dict], ascending: bool = False) -> List[Dict]:
-    """
-    Сортировка транзакций по дате.
-    """
-    return sorted(transactions, key=lambda t: t.get("date", ""), reverse=not ascending)
+def filter_by_status(transactions: List[Dict], status: str) -> List[Dict]:
+    """Фильтрация по статусу операции."""
+    return [t for t in transactions if t.get("state", "").upper() == status.upper()]
 
 
-def filter_by_currency(transactions: List[Dict], currency_code: str = "RUB") -> List[Dict]:
-    """
-    Фильтрация транзакций по коду валюты (по умолчанию: RUB).
-    """
-    return [
-        t for t in transactions
-        if t.get("operationAmount", {}).get("currency", {}).get("code") == currency_code
-    ]
+def sort_by_date(transactions: List[Dict], reverse: bool = True) -> List[Dict]:
+    """Сортировка по дате."""
+    return sorted(transactions, key=lambda x: x.get("date", ""), reverse=reverse)
+
+
+def search_by_description(transactions: List[Dict], query: str) -> List[Dict]:
+    """Фильтрация транзакций по описанию через re."""
+    pattern = re.compile(query, re.IGNORECASE)
+    return [t for t in transactions if pattern.search(t.get("description", ""))]
+
+
+def count_operations_by_category(transactions: List[Dict], categories: List[str]) -> Dict[str, int]:
+    """Подсчет количества операций по категориям."""
+    descriptions = [t.get("description", "") for t in transactions]
+    counter = Counter()
+    for category in categories:
+        counter[category] = sum(1 for desc in descriptions if category.lower() in desc.lower())
+    return dict(counter)
 
 
 def display_operations(transactions: List[Dict]) -> None:
-    """
-    Вывод списка операций в консоль в читаемом формате.
-    """
+    """Вывод списка операций в консоль в читаемом формате."""
     print(f"\nВсего банковских операций в выборке: {len(transactions)}\n")
     for t in transactions:
-        date = t.get("date", "")[:10]
+        date = format_date(t.get("date", ""))
         desc = t.get("description", "")
-        from_ = t.get("from", "Не указано")
-        to_ = t.get("to", "Не указано")
+        from_ = get_mask_account_card(t.get("from", "Не указано"))
+        to_ = get_mask_account_card(t.get("to", "Не указано"))
         amount = t.get("operationAmount", {}).get("amount", 0)
         currency = t.get("operationAmount", {}).get("currency", {}).get("code", "RUB")
         print(f"{date} {desc}\n{from_} -> {to_}\nСумма: {amount} {currency}\n")
