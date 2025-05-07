@@ -1,11 +1,10 @@
-from processing import filter_by_status, sort_by_date, search_by_description
-from generators import filter_by_currency
-from src.processing import display_operations
-from load_transactions import load_from_json
+from src.processing import filter_by_status, sort_by_date, search_by_description, display_operations
+from src.generators import filter_by_currency
+from src.load_transactions import load_from_json
 
 
 def main() -> None:
-    # Загружаем операции из файла
+    # Загрузка операций из файла
     file_path = "data/operations.json"
     operations = load_from_json(file_path)
 
@@ -14,7 +13,7 @@ def main() -> None:
         return
 
     while True:
-        print("\nМеню:")
+        print("\n📋 Меню:")
         print("1. Показать все операции")
         print("2. Фильтровать по статусу")
         print("3. Сортировать по дате")
@@ -42,13 +41,13 @@ def main() -> None:
             display_operations(found)
 
         elif choice == "5":
-            currency = input("Введите код валюты (например, USD): ")
+            currency = input("Введите код валюты (например, USD, EUR, RUB): ")
             filtered = list(filter_by_currency(operations, currency))
             display_operations(filtered)
 
         elif choice == "0":
-            print("Выход.")
+            print("Выход из программы.")
             break
 
         else:
-            print("Некорректный ввод. Повторите попытку.")
+            print("Некорректный выбор. Попробуйте снова.")

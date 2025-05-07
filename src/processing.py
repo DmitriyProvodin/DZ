@@ -1,36 +1,36 @@
 from typing import List, Dict
-from collections import Counter
-import re
-from src.widget import format_date, get_mask_account_card
+from src.widget import get_mask_account_card, format_date
 
 
 def filter_by_status(transactions: List[Dict], status: str) -> List[Dict]:
-    """Фильтрация по статусу операции."""
-    return [t for t in transactions if t.get("state", "").upper() == status.upper()]
+    """
+    Фильтрует список транзакций по указанному статусу.
+    """
+    return [t for t in transactions if t.get("state") == status]
 
 
-def sort_by_date(transactions: List[Dict], reverse: bool = True) -> List[Dict]:
-    """Сортировка по дате."""
-    return sorted(transactions, key=lambda x: x.get("date", ""), reverse=reverse)
+def sort_by_date(transactions: List[Dict]) -> List[Dict]:
+    """
+    Сортирует список транзакций по дате (от новых к старым).
+    """
+    return sorted(
+        transactions,
+        key=lambda t: t.get("date", ""),
+        reverse=True
+    )
 
 
-def search_by_description(transactions: List[Dict], query: str) -> List[Dict]:
-    """Фильтрация транзакций по описанию через re."""
-    pattern = re.compile(query, re.IGNORECASE)
-    return [t for t in transactions if pattern.search(t.get("description", ""))]
-
-
-def count_operations_by_category(transactions: List[Dict], categories: List[str]) -> Dict[str, int]:
-    """Подсчет количества операций по категориям."""
-    descriptions = [t.get("description", "") for t in transactions]
-    counter = Counter()
-    for category in categories:
-        counter[category] = sum(1 for desc in descriptions if category.lower() in desc.lower())
-    return dict(counter)
+def search_by_description(transactions: List[Dict], keyword: str) -> List[Dict]:
+    """
+    Ищет транзакции по ключевому слову в описании операции.
+    """
+    return [t for t in transactions if keyword.lower() in t.get("description", "").lower()]
 
 
 def display_operations(transactions: List[Dict]) -> None:
-    """Вывод списка операций в консоль в читаемом формате."""
+    """
+    Вывод списка операций в консоль в читаемом формате.
+    """
     print(f"\nВсего банковских операций в выборке: {len(transactions)}\n")
     for t in transactions:
         date = format_date(t.get("date", ""))
