@@ -1,13 +1,31 @@
-import json
-from typing import List, Dict
+import pandas as pd
+
+def load_csv_transactions(filepath: str) -> list[dict]:
+    """
+    Загружает финансовые транзакции из CSV-файла.
 
 
-def load_from_json(file_path: str) -> List[Dict]:
+    :param filepath: Путь к CSV-файлу.
+    :return: Список словарей с транзакциями.
     """
-    Загружает данные из JSON-файла.
+    df = pd.read_csv(filepath)
+    return df.to_dict(orient="records")
+
+def load_excel_transactions(filepath: str) -> list[dict]:
     """
-    try:
-        with open(file_path, encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    Загружает финансовые транзакции из Excel-файла.
+
+
+    :param filepath: Путь к Excel-файлу.
+    :return: Список словарей с транзакциями.
+    """
+    df = pd.read_excel(filepath)
+    return df.to_dict(orient="records")
+
+if __name__ == "__main__":
+    # Проверочный запуск
+    csv_data = load_csv_transactions("Data/transactions.csv")
+    print("CSV:", csv_data)
+
+    excel_data = load_excel_transactions("Data/transactions_excel.xlsx")
+    print("Excel:", excel_data)

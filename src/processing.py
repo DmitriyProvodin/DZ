@@ -9,14 +9,14 @@ def filter_by_status(transactions: List[Dict], status: str) -> List[Dict]:
     return [t for t in transactions if t.get("state") == status]
 
 
-def sort_by_date(transactions: List[Dict]) -> List[Dict]:
+def sort_by_date(transactions: List[Dict], ascending: bool=True) -> List[Dict]:
     """
     Сортирует список транзакций по дате (от новых к старым).
     """
     return sorted(
         transactions,
         key=lambda t: t.get("date", ""),
-        reverse=True
+        reverse=ascending
     )
 
 
