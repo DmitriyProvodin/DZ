@@ -1,33 +1,25 @@
-from typing import Union
+def mask_card_number(card_str: str) -> str:
+    """
+    Маскирует номер карты. Пример:
+    "Visa Classic 1234567812345678" → "Visa Classic 1234 56** **** 5678"
+    """
+    parts = card_str.rsplit(" ", 1)
+    if len(parts) != 2 or not parts[1].isdigit():
+        return card_str
 
-card_number: str = input("Введите номер карты:")
-account_number: str = input("Введите номер счета:")
-"""Получаем данные от пользователя"""
-
-
-def get_mask_card_number(card_number: Union[str]) -> Union[str]:
-    """Возвращаем замаскированый номер карты"""
-    len_number = 16
-    if isinstance(card_number, int):
-        card_number = str(card_number)
-    if len(card_number) == len_number and card_number.isdigit():
-        return f"{card_number[:4]} {card_number[4:6]}** **** {card_number[-4:]}"
-    else:
-        return "вы ввели некоректные данные!"
+    name, number = parts
+    masked = f"{number[:4]} {number[4:6]}** **** {number[-4:]}"
+    return f"{name} {masked}"
 
 
-def get_mask_account(account_number: Union[str]) -> Union[str]:
-    """Возвращаем замаскированный номер счёта"""
-    len_acc_number = 20
-    if isinstance(account_number, int):
-        account_number = str(account_number)
-    if len(account_number) == len_acc_number and account_number.isdigit():
-        return f"**{account_number[-4:]}"
-    else:
-        return "Вы ввели некоректные данные"
+def mask_account_number(account_str: str) -> str:
+    """
+    Маскирует номер счёта. Пример:
+    "Счет 12345678901234567890" → "Счет **7890"
+    """
+    parts = account_str.rsplit(" ", 1)
+    if len(parts) != 2 or not parts[1].isdigit():
+        return account_str
 
-
-print(get_mask_card_number("7000792289606361"))
-print(get_mask_account("73654108430135874305"))
-
-# изменения #
+    name, number = parts
+    return f"{name} **{number[-4:]}"

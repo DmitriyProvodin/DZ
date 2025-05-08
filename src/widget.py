@@ -1,30 +1,25 @@
-from . import masks
+from datetime import datetime
+from src.masks import mask_account_number, mask_card_number
 
-"""импортируем файлы из masks"""
 
-
-def mask_account_card(nums: str) -> str:
-    if "Счёт" in nums:
-        return masks.get_mask_account(nums)
+def get_mask_account_card(card_or_account: str) -> str:
+    number = card_or_account.split(" ")[-1]
+    if number.isdigit():
+        if len(number) == 16:
+            return mask_card_number(card_or_account)
+        else:
+            return mask_account_number(card_or_account)
     else:
-        cards = masks.get_mask_card_number(nums[-16:])
-        new_card = nums.replace(nums[-16:], cards)
-        return new_card
+        return card_or_account
 
 
-"создаём функцию шифрования данных"
-
-
-print(mask_account_card("Visa Platinum 7000792289606361"))
-
-
-def get_data(date: str) -> str:
-    return f"{date[8:10]}.{date[5:7]}.{date[0:4]}"
-
-
-"возвращаем корректную дату"
-
-
-print(get_data("2024-03-11T02:26:18.671407"))
-
-# изменения #
+def format_date(date_str: str) -> str:
+    """
+    Преобразует дату из ISO в формат "дд.мм.гггг"
+    Пример: "2019-12-08T22:46:21.935582" → "08.12.2019"
+    """
+    try:
+        date = datetime.fromisoformat(date_str)
+        return date.strftime("%d.%m.%Y")
+    except ValueError:
+        return date_str
